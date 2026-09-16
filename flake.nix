@@ -23,7 +23,22 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ rust-overlay.overlays.default ];
+            overlays = [ 
+              rust-overlay.overlays.default
+              (
+                # https://github.com/abl030/nixosconfig/blob/master/docs/wiki/infrastructure/cratesio-403-ua.md#fallback-overlay-if-we-need-to-fix-in-repo-builds-before-the-channel-catches-up
+                final: prev: {
+                  fetchCrate = args: prev.fetchCrate ({ registryDl = "https://static.crates.io/crates"; } // args);
+                  rustPlatform = prev.rustPlatform // {
+                    importCargoLock = args: prev.rustPlatform.importCargoLock (args // {
+                      extraRegistries = (args.extraRegistries or {}) // {
+                        "https://github.com/rust-lang/crates.io-index" = "https://static.crates.io/crates";
+                      };
+                    });
+                  };
+                }
+              )
+            ];
           };
 
           cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
