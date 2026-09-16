@@ -2,7 +2,7 @@
   description = "Static site generator for typst-based blog";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26-05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     flake-parts.url = "github:hercules-ci/flake-parts";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
