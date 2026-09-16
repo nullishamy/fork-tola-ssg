@@ -2,7 +2,7 @@
   description = "Static site generator for typst-based blog";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26-05";
     flake-parts.url = "github:hercules-ci/flake-parts";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -23,22 +23,7 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ 
-              rust-overlay.overlays.default
-              (
-                # https://github.com/abl030/nixosconfig/blob/master/docs/wiki/infrastructure/cratesio-403-ua.md#fallback-overlay-if-we-need-to-fix-in-repo-builds-before-the-channel-catches-up
-                final: prev: {
-                  fetchCrate = args: prev.fetchCrate ({ registryDl = "https://static.crates.io/crates"; } // args);
-                  rustPlatform = prev.rustPlatform // {
-                    importCargoLock = args: prev.rustPlatform.importCargoLock (args // {
-                      extraRegistries = (args.extraRegistries or {}) // {
-                        "https://github.com/rust-lang/crates.io-index" = "https://static.crates.io/crates";
-                      };
-                    });
-                  };
-                }
-              )
-            ];
+            overlays = [ rust-overlay.overlays.default ];
           };
 
           cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
