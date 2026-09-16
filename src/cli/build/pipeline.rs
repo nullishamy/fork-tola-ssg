@@ -108,23 +108,20 @@ pub(super) fn compile_and_process(
     let clean = config.build.clean;
     let has_error = AtomicBool::new(false);
 
-    let (metadata_result, assets_result) = rayon::join(
-        || {
-            page::build_static_pages(
-                mode,
-                config,
-                typst_host,
-                state,
-                clean,
-                Some(deps_hash),
-                page::GlobalStateMode::Rebuild,
-                warnings,
-                progress,
-            )
-        },
-        || process_assets(&files.assets, config, clean, &has_error, progress),
+    let metadata_result = page::build_static_pages(
+        mode,
+        config,
+        typst_host,
+        state,
+        clean,
+        Some(deps_hash),
+        page::GlobalStateMode::Rebuild,
+        warnings,
+        progress,
     );
 
+    let assets_result = process_assets(&files.assets, config, clean, &has_error, progress);
+    
     let metadata = metadata_result?;
     assets_result?;
 
